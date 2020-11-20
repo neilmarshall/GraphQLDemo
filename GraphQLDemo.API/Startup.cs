@@ -41,7 +41,7 @@ namespace GraphQLDemo.API
                     new OpenApiInfo
                     {
                         Title = "Cricinfo.API - Documentation",
-                        Version ="1.0.0"// Configuration["APIVersion"]
+                        Version ="1.0.0"
                     });
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
