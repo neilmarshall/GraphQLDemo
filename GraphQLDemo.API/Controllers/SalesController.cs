@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -30,8 +29,16 @@ namespace GraphQLDemo.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Customer>), Status200OK)]
         public async Task<IActionResult> Customers()
         {
-            var customers = await _bikeStoreRepository.GetCustomers();
-            return Ok(customers);
+            try
+            {
+                var customers = await _bikeStoreRepository.GetCustomers();
+                return Ok(customers);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -41,8 +48,16 @@ namespace GraphQLDemo.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<OrderItem>), Status200OK)]
         public async Task<IActionResult> OrderItems()
         {
-            var orderItems = await _bikeStoreRepository.GetOrdersItems();
-            return Ok(orderItems);
+            try
+            {
+                var orderItems = await _bikeStoreRepository.GetOrdersItems();
+                return Ok(orderItems);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -52,8 +67,16 @@ namespace GraphQLDemo.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Order>), Status200OK)]
         public async Task<IActionResult> Orders()
         {
-            var order = await _bikeStoreRepository.GetOrders();
-            return Ok(order);
+            try
+            {
+                var order = await _bikeStoreRepository.GetOrders();
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -63,8 +86,16 @@ namespace GraphQLDemo.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Staff>), Status200OK)]
         public async Task<IActionResult> Staff()
         {
-            var staff = await _bikeStoreRepository.GetStaff();
-            return Ok(staff);
+            try
+            {
+                var staff = await _bikeStoreRepository.GetStaff();
+                return Ok(staff);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(Status500InternalServerError);
+            }
         }
 
         /// <summary>
@@ -74,8 +105,16 @@ namespace GraphQLDemo.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Store>), Status200OK)]
         public async Task<IActionResult> Stores()
         {
-            var stores = await _bikeStoreRepository.GetStores();
-            return Ok(stores);
+            try
+            {
+                var stores = await _bikeStoreRepository.GetStores();
+                return Ok(stores);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(Status500InternalServerError);
+            }
         }
     }
 }
