@@ -9,12 +9,12 @@ namespace GraphQLDemo.Interfaces.Repository
     {
         Task<IEnumerable<Brand>> GetBrands();
         Task<IEnumerable<Category>> GetCategories();
-        Task<IEnumerable<Customer>> GetCustomers();
-        Task<IEnumerable<Order>> GetOrders();
-        Task<IEnumerable<OrderItem>> GetOrdersItems();
-        Task<IEnumerable<Product>> GetProducts();
+        Task<IEnumerable<Customer>> GetCustomers(int page, int itemsPerPage);
+        Task<IEnumerable<Order>> GetOrders(int page, int itemsPerPage);
+        Task<IEnumerable<OrderItem>> GetOrdersItems(int page, int itemsPerPage);
+        Task<IEnumerable<Product>> GetProducts(int page, int itemsPerPage);
         Task<IEnumerable<Staff>> GetStaff();
-        Task<IEnumerable<Stock>> GetStocks();
+        Task<IEnumerable<Stock>> GetStocks(int page, int itemsPerPage);
         Task<IEnumerable<Store>> GetStores();
     }
 }

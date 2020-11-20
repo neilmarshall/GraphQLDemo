@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -49,31 +47,51 @@ namespace GraphQLDemo.DAL
             return categories.Select(category => this._mapper.Map<Category>(category));
         }
 
-        public async Task<IEnumerable<Customer>> GetCustomers()
+        public async Task<IEnumerable<Customer>> GetCustomers(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [sales].[customers];";
-            var customers = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Customer>(query));
+            var query = "SELECT * FROM [sales].[customers] ORDER BY customer_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            var parameters = new Dictionary<string, object>
+            {
+                { "offset", (page - 1) * itemsPerPage },
+                { "rows", itemsPerPage }
+            };
+            var customers = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Customer>(query, parameters));
             return customers.Select(customer => this._mapper.Map<Customer>(customer));
         }
 
-        public async Task<IEnumerable<Order>> GetOrders()
+        public async Task<IEnumerable<Order>> GetOrders(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [sales].[orders];";
-            var orders = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Order>(query));
+            var query = "SELECT * FROM [sales].[orders] ORDER BY order_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            var parameters = new Dictionary<string, object>
+            {
+                { "offset", (page - 1) * itemsPerPage },
+                { "rows", itemsPerPage }
+            };
+            var orders = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Order>(query, parameters));
             return orders.Select(order => this._mapper.Map<Order>(order));
         }
 
-        public async Task<IEnumerable<OrderItem>> GetOrdersItems()
+        public async Task<IEnumerable<OrderItem>> GetOrdersItems(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [sales].[order_items];";
-            var orderItems = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.OrderItem>(query));
+            var query = "SELECT * FROM [sales].[order_items] ORDER BY order_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            var parameters = new Dictionary<string, object>
+            {
+                { "offset", (page - 1) * itemsPerPage },
+                { "rows", itemsPerPage }
+            };
+            var orderItems = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.OrderItem>(query, parameters));
             return orderItems.Select(orderItem => this._mapper.Map<OrderItem>(orderItem));
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<IEnumerable<Product>> GetProducts(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [production].[products];";
-            var products = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Product>(query));
+            var query = "SELECT * FROM [production].[products] ORDER BY product_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            var parameters = new Dictionary<string, object>
+            {
+                { "offset", (page - 1) * itemsPerPage },
+                { "rows", itemsPerPage }
+            };
+            var products = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Product>(query, parameters));
             return products.Select(product => this._mapper.Map<Product>(product));
         }
 
@@ -84,10 +102,15 @@ namespace GraphQLDemo.DAL
             return staff.Select(_staff => this._mapper.Map<Staff>(_staff));
         }
 
-        public async Task<IEnumerable<Stock>> GetStocks()
+        public async Task<IEnumerable<Stock>> GetStocks(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [production].[stocks];";
-            var stocks = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Stock>(query));
+            var query = "SELECT * FROM [production].[stocks] ORDER BY store_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            var parameters = new Dictionary<string, object>
+            {
+                { "offset", (page - 1) * itemsPerPage },
+                { "rows", itemsPerPage }
+            };
+            var stocks = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Stock>(query, parameters));
             return stocks.Select(stock => this._mapper.Map<Stock>(stock));
         }
 

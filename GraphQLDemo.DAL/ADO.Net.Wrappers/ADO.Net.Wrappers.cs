@@ -15,10 +15,16 @@ namespace GraphQLDemo.DAL.ADO.Net.Wrappers
             this._connectionString = connectionString;
         }
 
-        public List<T> GetRecords<T>(string query)
+        public List<T> GetRecords<T>(string query) => GetRecords<T>(query, new Dictionary<string, object>());
+
+        public List<T> GetRecords<T>(string query, Dictionary<string, object> parameters)
         {
             using var conn = new SqlConnection(this._connectionString);
             using var cmd = new SqlCommand(query, conn);
+            foreach (var kvp in parameters)
+            {
+                cmd.Parameters.AddWithValue(kvp.Key, kvp.Value);
+            }
             using var da = new SqlDataAdapter(cmd);
             var dt = new DataTable();
             da.Fill(dt);

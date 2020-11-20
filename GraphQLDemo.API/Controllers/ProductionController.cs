@@ -65,11 +65,15 @@ namespace GraphQLDemo.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Product>), Status200OK)]
-        public async Task<IActionResult> Products()
+        [ProducesResponseType(Status400BadRequest)]
+        public async Task<IActionResult> Products(int page, int itemsPerPage)
         {
+            if (page <= 0 || itemsPerPage <= 0)
+                return BadRequest();
+
             try
             {
-                var products = await _bikeStoreRepository.GetProducts();
+                var products = await _bikeStoreRepository.GetProducts(page, itemsPerPage);
                 return Ok(products);
             }
             catch (Exception ex)
@@ -84,11 +88,15 @@ namespace GraphQLDemo.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Stock>), Status200OK)]
-        public async Task<IActionResult> Stocks()
+        [ProducesResponseType(Status400BadRequest)]
+        public async Task<IActionResult> Stocks(int page, int itemsPerPage)
         {
+            if (page <= 0 || itemsPerPage <= 0)
+                return BadRequest();
+
             try
             {
-                var stocks = await _bikeStoreRepository.GetStocks();
+                var stocks = await _bikeStoreRepository.GetStocks(page, itemsPerPage);
                 return Ok(stocks);
             }
             catch (Exception ex)

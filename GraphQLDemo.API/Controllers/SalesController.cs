@@ -27,11 +27,15 @@ namespace GraphQLDemo.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Customer>), Status200OK)]
-        public async Task<IActionResult> Customers()
+        [ProducesResponseType(Status400BadRequest)]
+        public async Task<IActionResult> Customers(int page, int itemsPerPage)
         {
+            if (page <= 0 || itemsPerPage <= 0)
+                return BadRequest();
+
             try
             {
-                var customers = await _bikeStoreRepository.GetCustomers();
+                var customers = await _bikeStoreRepository.GetCustomers(page, itemsPerPage);
                 return Ok(customers);
             }
             catch (Exception ex)
@@ -46,11 +50,15 @@ namespace GraphQLDemo.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<OrderItem>), Status200OK)]
-        public async Task<IActionResult> OrderItems()
+        [ProducesResponseType(Status400BadRequest)]
+        public async Task<IActionResult> OrderItems(int page, int itemsPerPage)
         {
+            if (page <= 0 || itemsPerPage <= 0)
+                return BadRequest();
+
             try
             {
-                var orderItems = await _bikeStoreRepository.GetOrdersItems();
+                var orderItems = await _bikeStoreRepository.GetOrdersItems(page, itemsPerPage);
                 return Ok(orderItems);
             }
             catch (Exception ex)
@@ -65,11 +73,15 @@ namespace GraphQLDemo.API.Controllers
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Order>), Status200OK)]
-        public async Task<IActionResult> Orders()
+        [ProducesResponseType(Status400BadRequest)]
+        public async Task<IActionResult> Orders(int page, int itemsPerPage)
         {
+            if (page <= 0 || itemsPerPage <= 0)
+                return BadRequest();
+
             try
             {
-                var order = await _bikeStoreRepository.GetOrders();
+                var order = await _bikeStoreRepository.GetOrders(page, itemsPerPage);
                 return Ok(order);
             }
             catch (Exception ex)
