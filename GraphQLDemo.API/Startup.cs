@@ -57,9 +57,10 @@ namespace GraphQLDemo.API
             services.AddScoped<IBikeStoreRepository>(_ =>
                     new BikeStoreRepository(Configuration.GetConnectionString("AzureDBConnection")));
 
-            services.AddScoped<BikeStoreSchema>();
             services.AddScoped<BikeStoreQuery>();
+            services.AddScoped<BikeStoreSchema>();
             services.AddGraphQL()
+                .AddSystemTextJson()
                 .AddGraphTypes(ServiceLifetime.Scoped);
         }
 
@@ -90,7 +91,7 @@ namespace GraphQLDemo.API
             });
 
             app.UseGraphQL<BikeStoreSchema>();
-            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions { });
+            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions { });  // to explorer API navigate https://*DOMAIN*/ui/playground
         }
     }
 }
