@@ -55,7 +55,7 @@ namespace GraphQLDemo.API
             });
 
             services.AddScoped<IBikeStoreRepository>(_ =>
-                    new BikeStoreRepository(Configuration.GetConnectionString("AzureDBConnection")));
+                new BikeStoreRepository(Configuration.GetConnectionString("AzureDBConnection")));
 
             services.AddScoped<BikeStoreQuery>();
             services.AddScoped<BikeStoreSchema>();
