@@ -10,7 +10,7 @@ namespace GraphQLDemo.API.GraphQLModel
         {
             Field<ListGraphType<BrandType>>(
                 "brands",
-                resolve: context => bikeStoreRepository.GetProducts(1, 10));  // TODO - parameterise query and replace hardcoded values
+                resolve: context => bikeStoreRepository.GetBrands());  // TODO - parameterise query and replace hardcoded values
         }
     }
 }

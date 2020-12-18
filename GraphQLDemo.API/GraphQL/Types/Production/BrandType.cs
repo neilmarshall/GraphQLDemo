@@ -1,5 +1,5 @@
 ﻿using GraphQL.Types;
-using GraphQLDemo.DAL.DTOs.Production;
+using GraphQLDemo.Interfaces.Models.Production;
 
 namespace GraphQLDemo.API.GraphQLModel.Types.Production
 {
