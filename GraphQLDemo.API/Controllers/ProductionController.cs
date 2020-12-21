@@ -25,6 +25,30 @@ namespace GraphQLDemo.API.Controllers
         /// <summary>
         /// Return brand details
         /// </summary>
+        [HttpGet("{brandId}")]
+        [ProducesResponseType(typeof(Brand), Status200OK)]
+        [ProducesResponseType(Status404NotFound)]
+        public async Task<IActionResult> Brand(int brandId)
+        {
+            try
+            {
+                var brand = await _bikeStoreRepository.GetBrand(brandId);
+
+                if (brand == null)
+                    return NotFound();
+
+                return Ok(brand);
+            }
+            catch (Exception ex)
+            {
+                this._logger.LogError(ex, ex.Message);
+                return new StatusCodeResult(Status500InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Return brand details
+        /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Brand>), Status200OK)]
         public async Task<IActionResult> Brands()

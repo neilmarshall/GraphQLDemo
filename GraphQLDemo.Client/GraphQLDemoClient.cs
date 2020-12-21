@@ -28,5 +28,18 @@ namespace GraphQLDemo.Client
 
             return brands.Data.Brands;
         }
+
+        public async Task<Brand> GetBrand(int brandId)
+        {
+            var request = new GraphQLRequest
+            {
+                Query = @"query($brandId: Int!) {brand(brandId: $brandId) {brandName}}",
+                Variables = new { brandId = $"{brandId}" }
+            };
+
+            var brand = await this._client.SendQueryAsync(request, () => new { Brand = new Brand() });
+
+            return brand.Data.Brand;
+        }
     }
 }

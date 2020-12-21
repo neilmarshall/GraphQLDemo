@@ -33,6 +33,14 @@ namespace GraphQLDemo.DAL
             }));
         }
 
+        public async Task<Brand> GetBrand(int brandId)
+        {
+            var query = "SELECT * FROM [production].[brands] WHERE [brand_id] = @brandId;";
+            var parameters = new Dictionary<string, object>{ { "brandId", brandId } };
+            var brands = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Brand>(query, parameters));
+            return brands.Select(brand => this._mapper.Map<Brand>(brand)).FirstOrDefault();
+        }
+
         public async Task<IEnumerable<Brand>> GetBrands()
         {
             var query = "SELECT * FROM [production].[brands];";

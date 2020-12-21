@@ -9,9 +9,20 @@ namespace GraphQLDemo.API.GraphQLModel
     {
         public BikeStoreQuery(IBikeStoreRepository bikeStoreRepository)
         {
+            Field<BrandType>(
+                "brand",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name="brandId" }),
+                resolve: context =>
+                {
+                    var brandId = context.GetArgument<int>("brandId");
+                    return bikeStoreRepository.GetBrand(brandId);
+                });
+
             Field<ListGraphType<BrandType>>(
                 "brands",
                 resolve: context => bikeStoreRepository.GetBrands());
+
             Field<ListGraphType<ProductType>>(
                 "products",
                 arguments: new QueryArguments(

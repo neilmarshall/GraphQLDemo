@@ -8,11 +8,17 @@ namespace GraphQLDemo.Client.Tests
     [TestClass]
     public class GraphQLDemoClientFixtures
     {
+        private static GraphQLDemoClient client;
+
+        [ClassInitialize]
+        public static void Initialize(TestContext testContext)
+        {
+            client = new GraphQLDemoClient("https://localhost:5001/graphql");
+        }
+
         [TestMethod]
         public async Task GetBrandsFixture()
         {
-            var client = new GraphQLDemoClient("https://localhost:5001/graphql");
-
             var actual = await client.GetBrands();
 
             var expected = new Brand[]
@@ -33,6 +39,16 @@ namespace GraphQLDemo.Client.Tests
                 Assert.AreEqual(e.Id, a.Id);
                 Assert.AreEqual(e.BrandName, a.BrandName);
             }
+        }
+
+        [DataTestMethod]
+        [DataRow(1, "Electra")]
+        [DataRow(99, null)]
+        public async Task GetBrandFixture(int brandId, string expectedBrandName)
+        {
+            var actual = await client.GetBrand(brandId);
+
+            Assert.AreEqual(expectedBrandName, actual?.BrandName);
         }
     }
 }
