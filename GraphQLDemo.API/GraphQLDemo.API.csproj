@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Folder Include="GraphQL\Types\Sales\" />
+    <Folder Include="GraphQL\Types\Sales\" />
   </ItemGroup>
 
   <PropertyGroup>

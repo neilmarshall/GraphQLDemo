@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using GraphQLDemo.API.GraphQLModel.Types.Production;
+using GraphQLDemo.API.GraphQLModel.Types.Sales;
 using GraphQLDemo.Interfaces.Repository;
 
 namespace GraphQLDemo.API.GraphQLModel
@@ -33,6 +34,20 @@ namespace GraphQLDemo.API.GraphQLModel
                     var page = context.GetArgument<int>("page");
                     var itemsPerPage = context.GetArgument<int>("itemsPerPage");
                     return bikeStoreRepository.GetProducts(page, itemsPerPage);
+                });
+
+            Field<ListGraphType<StaffType>>(
+                "staff",
+                resolve: cotext =>
+                {
+                    return bikeStoreRepository.GetStaff();
+                });
+
+            Field<ListGraphType<StoreType>>(
+                "stores",
+                resolve: cotext =>
+                {
+                    return bikeStoreRepository.GetStores();
                 });
         }
     }
