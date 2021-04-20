@@ -38,14 +38,14 @@ namespace GraphQLDemo.API.GraphQLModel
 
             Field<ListGraphType<StaffType>>(
                 "staff",
-                resolve: cotext =>
+                resolve: context =>
                 {
                     return bikeStoreRepository.GetStaff();
                 });
 
             Field<ListGraphType<StoreType>>(
                 "stores",
-                resolve: cotext =>
+                resolve: context =>
                 {
                     return bikeStoreRepository.GetStores();
                 });
