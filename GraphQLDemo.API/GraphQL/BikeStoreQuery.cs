@@ -1,4 +1,5 @@
-﻿using GraphQL;
+﻿using System.Threading.Tasks;
+using GraphQL;
 using GraphQL.Types;
 using GraphQLDemo.API.GraphQLModel.Types.Production;
 using GraphQLDemo.API.GraphQLModel.Types.Sales;
@@ -10,19 +11,18 @@ namespace GraphQLDemo.API.GraphQLModel
     {
         public BikeStoreQuery(IBikeStoreRepository bikeStoreRepository)
         {
-            Field<BrandType>(
-                "brand",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name="brandId" }),
-                resolve: context =>
-                {
-                    var brandId = context.GetArgument<int>("brandId");
-                    return bikeStoreRepository.GetBrand(brandId);
-                });
-
             Field<ListGraphType<BrandType>>(
                 "brands",
-                resolve: context => bikeStoreRepository.GetBrands());
+                arguments: new QueryArguments(
+                    new QueryArgument<IntGraphType> { Name="brandId" }),
+                resolve: context =>
+                {
+                    var brandId = context.GetArgument<int?>("brandId");
+
+                    if (brandId.HasValue)
+                        return Task.WhenAll(bikeStoreRepository.GetBrand(brandId.Value));
+                    return bikeStoreRepository.GetBrands();
+                });
 
             Field<ListGraphType<ProductType>>(
                 "products",
