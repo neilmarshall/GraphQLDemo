@@ -58,7 +58,7 @@ namespace GraphQLDemo.API.Controllers
 
             try
             {
-                var orderItems = await _bikeStoreRepository.GetOrdersItems(page, itemsPerPage);
+                var orderItems = await _bikeStoreRepository.GetOrderItems(page, itemsPerPage);
                 return Ok(orderItems);
             }
             catch (Exception ex)

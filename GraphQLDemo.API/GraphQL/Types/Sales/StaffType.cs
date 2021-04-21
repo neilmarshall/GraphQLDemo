@@ -14,7 +14,7 @@ namespace GraphQLDemo.API.GraphQLModel.Types.Sales
             Field(t => t.Email);
             Field(t => t.FirstName);
             Field(t => t.LastName);
-            Field(t => t.ManagerId);
+            Field(t => t.ManagerId, nullable: true);
             Field(t => t.Phone);
             Field(t => t.StaffId);
             Field<StoreType, Store>()

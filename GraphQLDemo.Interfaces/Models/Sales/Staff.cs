@@ -14,7 +14,7 @@ namespace GraphQLDemo.Interfaces.Models.Sales
         public string Phone { get; set; }
         public bool Active { get; set; }
         public int StoreId { get; set; }
-        public int ManagerId { get; set; }
+        public int? ManagerId { get; set; }
     }
 }
 

@@ -6,20 +6,21 @@ using AutoMapper;
 using GraphQLDemo.Interfaces.Models.Production;
 using GraphQLDemo.Interfaces.Models.Sales;
 using GraphQLDemo.Interfaces.Repository;
-using GraphQLDemo.DAL.ADO.Net.Wrappers;
+using System.Data.SqlClient;
+using Dapper;
 
 namespace GraphQLDemo.DAL
 {
     public class BikeStoreRepository : IBikeStoreRepository
     {
-        private readonly ADOHelper _adoHelper;
+        private readonly string _connectionString;
         private readonly Mapper _mapper;
 
         public BikeStoreRepository(string connectionString)
         {
-            this._adoHelper = new ADOHelper(connectionString);
+            _connectionString = connectionString;
 
-            this._mapper = new Mapper(new MapperConfiguration(cfg =>
+            _mapper = new Mapper(new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<DTOs.Production.Brand, Brand>();
                 cfg.CreateMap<DTOs.Production.Category, Category>();
@@ -35,98 +36,92 @@ namespace GraphQLDemo.DAL
 
         public async Task<Brand> GetBrand(int brandId)
         {
-            var query = "SELECT * FROM [production].[brands] WHERE [brand_id] = @brandId;";
-            var parameters = new Dictionary<string, object>{ { "brandId", brandId } };
-            var brands = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Brand>(query, parameters));
-            return brands.Select(brand => this._mapper.Map<Brand>(brand)).FirstOrDefault();
+            var query = "SELECT brand_id id, brand_name brandName FROM [production].[brands] WHERE [brand_id] = @brandId;";
+            using var connection = new SqlConnection(_connectionString);
+            var brand = (await connection.QueryFirstOrDefaultAsync<DTOs.Production.Brand>(query, new { brandId }));
+            return _mapper.Map<Brand>(brand);
         }
 
         public async Task<IEnumerable<Brand>> GetBrands()
         {
-            var query = "SELECT * FROM [production].[brands];";
-            var brands = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Brand>(query));
-            return brands.Select(brand => this._mapper.Map<Brand>(brand));
+            var query = "SELECT brand_id id, brand_name brandName FROM [production].[brands];";
+            using var connection = new SqlConnection(_connectionString);
+            var brands = (await connection.QueryAsync<DTOs.Production.Brand>(query)).ToList();
+            return brands.Select(brand => _mapper.Map<Brand>(brand));
         }
 
         public async Task<IEnumerable<Category>> GetCategories()
         {
-            var query = "SELECT * FROM [production].[categories];";
-            var categories = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Category>(query));
-            return categories.Select(category => this._mapper.Map<Category>(category));
+            var query = "SELECT category_id id, category_name categoryName FROM [production].[categories];";
+            using var connection = new SqlConnection(_connectionString);
+            var categories = (await connection.QueryAsync<DTOs.Production.Category>(query)).ToList();
+            return categories.Select(category => _mapper.Map<Category>(category));
         }
 
         public async Task<IEnumerable<Customer>> GetCustomers(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [sales].[customers] ORDER BY customer_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
-            var parameters = new Dictionary<string, object>
-            {
-                { "offset", (page - 1) * itemsPerPage },
-                { "rows", itemsPerPage }
-            };
-            var customers = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Customer>(query, parameters));
-            return customers.Select(customer => this._mapper.Map<Customer>(customer));
+            var query = "SELECT customer_id id, first_name firstName, last_name lastName, phone, email, street, city, state, zip_code zipcode FROM [sales].[customers] ORDER BY customer_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            using var connection = new SqlConnection(_connectionString);
+            var customers = (await connection.QueryAsync<DTOs.Sales.Customer>(
+                query,
+                new { offset = (page - 1) * itemsPerPage, rows = itemsPerPage })).ToList();
+            return customers.Select(customer => _mapper.Map<Customer>(customer));
         }
 
         public async Task<IEnumerable<Order>> GetOrders(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [sales].[orders] ORDER BY order_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
-            var parameters = new Dictionary<string, object>
-            {
-                { "offset", (page - 1) * itemsPerPage },
-                { "rows", itemsPerPage }
-            };
-            var orders = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Order>(query, parameters));
-            return orders.Select(order => this._mapper.Map<Order>(order));
+            var query = "SELECT order_id id, customer_id customerId, order_status orderStatus, order_date orderDate, required_date requiredDate, shipped_date shippedDate, store_id storeId, staff_id staffId FROM [sales].[orders] ORDER BY order_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            using var connection = new SqlConnection(_connectionString);
+            var orders = (await connection.QueryAsync<DTOs.Sales.Order>(
+                query,
+                new { offset = (page - 1) * itemsPerPage, rows = itemsPerPage })).ToList();
+            return orders.Select(order => _mapper.Map<Order>(order));
         }
 
-        public async Task<IEnumerable<OrderItem>> GetOrdersItems(int page, int itemsPerPage)
+        public async Task<IEnumerable<OrderItem>> GetOrderItems(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [sales].[order_items] ORDER BY order_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
-            var parameters = new Dictionary<string, object>
-            {
-                { "offset", (page - 1) * itemsPerPage },
-                { "rows", itemsPerPage }
-            };
-            var orderItems = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.OrderItem>(query, parameters));
-            return orderItems.Select(orderItem => this._mapper.Map<OrderItem>(orderItem));
+            var query = "SELECT order_id id, item_id itemId, product_id productId, quantity, list_price listPrice, discount FROM [sales].[order_items] ORDER BY order_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            using var connection = new SqlConnection(_connectionString);
+            var orderItems = (await connection.QueryAsync<DTOs.Sales.OrderItem>(
+                query,
+                new { offset = (page - 1) * itemsPerPage, rows = itemsPerPage })).ToList();
+            return orderItems.Select(orderItem => _mapper.Map<OrderItem>(orderItem));
         }
 
         public async Task<IEnumerable<Product>> GetProducts(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [production].[products] ORDER BY product_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
-            var parameters = new Dictionary<string, object>
-            {
-                { "offset", (page - 1) * itemsPerPage },
-                { "rows", itemsPerPage }
-            };
-            var products = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Product>(query, parameters));
-            return products.Select(product => this._mapper.Map<Product>(product));
+            var query = "SELECT product_id id, product_name productName, brand_id brandId, category_id categoryId, model_year modelYear, list_price ListPrice FROM [production].[products] ORDER BY product_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            using var connection = new SqlConnection(_connectionString);
+            var products = (await connection.QueryAsync<DTOs.Production.Product>(
+                query,
+                new { offset = (page - 1) * itemsPerPage , rows = itemsPerPage })).ToList();
+            return products.Select(product => _mapper.Map<Product>(product));
         }
 
         public async Task<IEnumerable<Staff>> GetStaff()
         {
-            var query = "SELECT * FROM [sales].[staffs];";
-            var staff = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Staff>(query));
-            return staff.Select(_staff => this._mapper.Map<Staff>(_staff));
+            var query = "SELECT staff_id staffId, first_name firstName, last_name lastName, email, phone, active, store_id storeId, manager_id managerId FROM [sales].[staffs];";
+            using var connection = new SqlConnection(_connectionString);
+            var staff = (await connection.QueryAsync<DTOs.Sales.Staff>(query)).ToList();
+            return staff.Select(_staff => _mapper.Map<Staff>(_staff));
         }
 
         public async Task<IEnumerable<Stock>> GetStocks(int page, int itemsPerPage)
         {
-            var query = "SELECT * FROM [production].[stocks] ORDER BY store_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
-            var parameters = new Dictionary<string, object>
-            {
-                { "offset", (page - 1) * itemsPerPage },
-                { "rows", itemsPerPage }
-            };
-            var stocks = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Production.Stock>(query, parameters));
-            return stocks.Select(stock => this._mapper.Map<Stock>(stock));
+            var query = "SELECT store_id storeId, product_id productId, quantity FROM [production].[stocks] ORDER BY store_id OFFSET @offset ROWS FETCH NEXT @rows ROWS ONLY;";
+            using var connection = new SqlConnection(_connectionString);
+            var stocks = (await connection.QueryAsync<DTOs.Production.Stock>(
+                query,
+                new { offset = (page - 1) * itemsPerPage, rows = itemsPerPage })).ToList();
+            return stocks.Select(stock => _mapper.Map<Stock>(stock));
         }
 
         public async Task<IEnumerable<Store>> GetStores()
         {
-            var query = "SELECT * FROM [sales].[stores];";
-            var stores = await Task.Run(() => this._adoHelper.GetRecords<DTOs.Sales.Store>(query));
-            return stores.Select(store => this._mapper.Map<Store>(store));
+            var query = "SELECT store_id id, store_name storeName, phone, email, street, city, state, zip_code zipCode FROM [sales].[stores];";
+            using var connection = new SqlConnection(_connectionString);
+            var stores = (await connection.QueryAsync<DTOs.Sales.Store>(query)).ToList();
+            return stores.Select(store => _mapper.Map<Store>(store));
         }
     }
 }
